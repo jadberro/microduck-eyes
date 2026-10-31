@@ -1,0 +1,39 @@
+[project]
+name = "microduck-eyes"
+version = "0.1.0"
+description = "Cute cartoon duck eyes for two round GC9A01 screens, with a desktop simulator"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy>=2.0",
+]
+
+[project.optional-dependencies]
+desktop = [
+    "pygame-ce>=2.5",
+]
+camera = [
+    "opencv-python-headless>=4.9,<5",   # 5.x dropped the bundled Haar cascades
+]
+hardware = [
+    "spidev>=3.6; sys_platform == 'linux'",
+    "gpiod>=2.1; sys_platform == 'linux'",
+]
+
+[project.scripts]
+microduck-eyes = "microduck_eyes.app:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "pygame-ce>=2.5",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/microduck_eyes"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

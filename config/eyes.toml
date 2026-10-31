@@ -1,0 +1,83 @@
+# Microduck eye configuration. All lengths in pixels on the 240x240 panel unless noted.
+
+[panel]
+size = 240
+px_per_mm = 7.4            # 240 px over ~32.4 mm active area
+
+[layout]
+eye_spacing_mm = 45.0      # centre to centre
+bezel_mm = 1.5             # black ring around the active area
+gaze_depth_mm = 300.0      # default distance of things the duck looks at
+
+[colours]
+face = [255, 204, 0]       # duck yellow, fills the panel outside the eye and the lids
+sclera = [255, 255, 255]
+outline = [40, 30, 20]
+pupil = [20, 16, 14]
+highlight = [255, 255, 255]
+lid_edge = [225, 150, 0]   # slightly darker line along the lid edge
+
+[eye]
+sclera_r = 106             # white disc radius
+outline_w = 3              # dark ring thickness
+pupil_r = 46               # base pupil radius (scaled by expressions)
+pupil_margin = 4           # pupil stays this far inside the sclera
+highlight_big_r = 11
+highlight_big_offset = [-16, -16]   # relative to pupil centre, scaled with pupil
+highlight_small_r = 5
+highlight_small_offset = [12, 14]
+lid_curve = 0.18           # how much the lid edge bows (fraction of sclera_r)
+lid_edge_w = 2.5
+lid_meet_y = 0.3           # fraction of sclera_r below centre where closed lids meet
+
+[animation]
+blink_close_ms = 100
+blink_hold_ms = 40
+blink_open_ms = 160
+blink_interval_s = [2.0, 6.0]
+double_blink_chance = 0.15
+saccade_interval_s = [0.6, 2.2]
+saccade_range_mm = 60.0
+gaze_move_ms = 180
+expression_ms = 300
+mouse_idle_after_s = 3.0
+
+[brows]
+enabled = true
+colour = [60, 40, 25]
+thickness = 8.0
+radius = 113.0             # arc radius from the panel centre at rest
+half_angle_deg = 36.0
+
+[iris]
+enabled = true
+scale = 1.45               # times the pupil radius
+colour = [214, 150, 48]
+mood_colour = [236, 118, 92]   # blended in when the duck is petted
+
+[personality]
+lazy_eye = 0.0             # 0..1, right eye lags and drifts outward
+wink_chance = 0.08         # chance a scheduled blink becomes a wink
+glance_away_s = [4.0, 9.0] # how often it breaks eye contact for a moment
+
+[camera]
+enabled = false            # needs the 'camera' extra (opencv); J toggles it in the simulator
+index = 0
+width = 320
+height = 240
+hfov_deg = 60.0
+face_width_mm = 150.0
+mirror = false
+fps = 10.0
+
+[behaviour]
+enabled = true
+light_adapt_s = 0.8
+pupil_dark = 1.25
+pupil_bright = 0.80
+vor_gain = 0.9             # px of counter-rotation per degree of head turn
+vor_decay_s = 0.5
+morning_hour = 6
+evening_hour = 20
+night_hour = 23
+low_battery = 15.0
