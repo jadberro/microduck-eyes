@@ -1,15 +1,95 @@
-# Microduck Eyes
+<p align="center">
+  <img src="docs/images/eyes.gif" alt="Microduck eyes animation" width="560">
+</p>
 
-Cute cartoon duck eyes for two 1.28" round GC9A01 panels, with a desktop simulator
-that shows both eyes at true relative scale. The eye code is written to run unchanged
-on the Radxa Zero later; only the display backend swaps.
+<h1 align="center">Microduck Eyes</h1>
 
-Plan and design notes: [plans/001-eye-simulator-plan.md](plans/001-eye-simulator-plan.md).
+<p align="center">
+  Cute cartoon duck eyes for a small robot: two round 1.28" GC9A01 screens driven from a Radxa Zero,
+  with a desktop simulator that shows them at true physical size.
+</p>
+
+<p align="center">
+  <a href="https://github.com/jadberro/microduck-eyes/actions/workflows/tests.yml"><img src="https://github.com/jadberro/microduck-eyes/actions/workflows/tests.yml/badge.svg" alt="tests"></a>
+  <img src="https://img.shields.io/badge/python-3.12%2B-blue" alt="python 3.12+">
+  <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT">
+  <img src="https://img.shields.io/badge/deps-numpy%20only%20core-lightgrey" alt="numpy only core">
+</p>
+
+---
+
+## What this is
+
+The Microduck is a small duck robot. This repository is its eyes: a renderer and behaviour engine
+for two 240x240 round LCD panels, plus a simulator that runs on a laptop so the look and the
+behaviour can be designed before the hardware exists. The same eye code will run on the robot;
+only the display backend changes from a window to SPI.
+
+Design goals, in order:
+
+1. **Cute.** A flat cartoon style: white sclera, big dark pupil, textured iris, two highlights,
+   skin-coloured lids and expressive brows. Ten expressions tuned to read at a glance.
+2. **Light.** The core depends on numpy only, renders nothing while the eyes are still, draws from
+   cached sprites, and reports a dirty rectangle so only changed pixels cross the SPI bus.
+   Idle cost is near zero; a full eye renders in about 0.3 ms.
+3. **Alive.** A behaviour engine gives the eyes attention, eye contact, pupil response to light,
+   a vestibular reflex, a circadian rhythm, speech cues and moods, fed by a sensor hub that takes
+   simulated input, a webcam, or messages from another computer.
+4. **Funny.** Forty-one themed takeovers, from a HAL 9000 lens to Scrooge dollar eyes, plus
+   interaction games and status glances.
+
+<p align="center">
+  <img src="docs/images/hero.png" alt="Happy eyes at 2x life size" width="720">
+</p>
+
+## Gallery
+
+| Expressions | Themes |
+|---|---|
+| <img src="docs/images/expressions.png" alt="Expression sheet" width="400"> | <img src="docs/images/themes.png" alt="Theme sheet" width="400"> |
+
+| True to size and pixel structure | Face mockup view |
+|---|---|
+| <img src="docs/images/zoom3-pixel-gaps.png" alt="3x zoom with simulated pixel gaps" width="400"> | <img src="docs/images/face-view.png" alt="Face view" width="400"> |
+
+| Control panel | Dome lens preview |
+|---|---|
+| <img src="docs/images/control-panel.png" alt="Control panel" width="400"> | <img src="docs/images/dome-lens.png" alt="Dome lens" width="400"> |
+
+## Hardware target
+
+| Part | Notes |
+|---|---|
+| 2x 1.28" round IPS LCD, GC9A01 controller | 240x240, RGB565, 4-wire SPI, 3.3 V. Active area about 32.4 mm, 7.4 px/mm |
+| Radxa Zero | Amlogic S905Y2, four Cortex-A53. SPI via spidev, GPIO via libgpiod |
+| Optional | USB camera for eye contact, light sensor, IMU for the vestibular reflex, touch sensor for petting. Perception can also run on a separate machine (for example a Jetson) and arrive as UDP messages |
+
+Both panels share clock and data; each has its own chip select. Only the changed region of each
+frame is written, so blinks and gaze moves stay well inside a 30 fps budget on one shared bus.
+The hardware backend is the next milestone; see the plan for the bring-up order.
+
+## How it fits together
+
+```
+sensors (mouse / webcam / UDP "sense")  ->  SensorHub
+                                              |
+Animator (tweens, blinks, gaze, saccades) -> Behaviour (attention, light, reflexes, mood) -> ThemeController (gags, games, glances)
+                                                                                                    |
+                                                                        EyeState x2 -> EyeRenderer -> 240x240 frame + dirty rect
+                                                                                                    |
+                                                                  DesktopDisplay (pygame window)  or  GC9A01Display (SPI, planned)
+```
+
+Everything is time-driven and quantised, so when nothing changes, nothing is rendered or sent.
 
 ## Run the simulator
 
+Requires [uv](https://docs.astral.sh/uv/). Python 3.12 or newer is fetched automatically.
+
 ```sh
-uv sync --extra desktop
+git clone https://github.com/jadberro/microduck-eyes.git
+cd microduck-eyes
+uv sync --extra desktop          # add --extra camera for webcam support
 uv run microduck-eyes            # or: uv run python -m microduck_eyes
 ```
 
@@ -250,3 +330,20 @@ tests/                      pytest suite with perf gates
 `--display gc9a01` will drive the real panels via spidev and gpiod on the Radxa Zero using
 partial window writes. Wiring and pin numbers will be recorded in `docs/wiring.md` once the
 screens and board are in hand.
+
+## Project status and plan
+
+The design document and progress table live in [plans/001-eye-simulator-plan.md](plans/001-eye-simulator-plan.md).
+Done: simulator, renderer, animation, themes, behaviour engine, sensors, camera, control panel.
+Next: the GC9A01 SPI backend on the Radxa Zero, once the panels are in hand.
+
+## Contributing
+
+Issues and pull requests are welcome. Run `uv run pytest` before opening one; the suite includes
+performance gates so the eyes stay cheap to render. New themes are small classes in
+[themes.py](src/microduck_eyes/eye/themes.py); new pupil shapes are predicates in
+[pupil_sprites.py](src/microduck_eyes/eye/pupil_sprites.py).
+
+## Licence
+
+MIT. See [LICENSE](LICENSE).

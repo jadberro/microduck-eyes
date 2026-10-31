@@ -2,7 +2,11 @@
 name = "microduck-eyes"
 version = "0.1.0"
 description = "Cute cartoon duck eyes for two round GC9A01 screens, with a desktop simulator"
+readme = "README.md"
+license = "MIT"
+authors = [{ name = "Jad Berro" }]
 requires-python = ">=3.12"
+keywords = ["robot", "eyes", "gc9a01", "radxa", "pygame", "animation"]
 dependencies = [
     "numpy>=2.0",
 ]
@@ -26,6 +30,7 @@ microduck-eyes = "microduck_eyes.app:main"
 dev = [
     "pytest>=8",
     "pygame-ce>=2.5",
+    "pillow>=10",
 ]
 
 [build-system]
